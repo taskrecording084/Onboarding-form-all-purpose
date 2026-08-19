@@ -1,0 +1,322 @@
+================================================================================
+THOR - SPECIALIST ONBOARDING
+VALIDATION RULES
+================================================================================
+
+Scope        : 11 validated fields + 1 consent control, across 3 steps.
+Source of    : src/app/validators/form-validators.ts   (the rules)
+truth          src/app/onboarding/field-rules.ts       (chip labels + messages)
+               src/app/data/onboarding-data.ts         (country / blocklist data)
+Tests        : src/app/validators/form-validators.spec.ts
+
+Conventions used below
+  - "required" fires only when the field is empty; it suppresses all other rules.
+  - Every other rule reports independently, so a field can fail several rules at
+    once. The UI shows one chip per rule and lights each chip as it is satisfied.
+  - The error message shown under an input is the FIRST failing rule in the order
+    listed here, so guidance is never ambiguous.
+  - Validation runs on every keystroke. Messages appear only after the field has
+    been touched or blurred, so nothing shouts at a half-typed value.
+  - Nothing is auto-corrected. A trailing space is reported, not silently trimmed.
+
+================================================================================
+STEP 01 - IDENTITY
+================================================================================
+
+--------------------------------------------------------------------------------
+01. LEGAL NAME              control: fullName          type: text
+--------------------------------------------------------------------------------
+    R1  required            Must not be empty or whitespace only.
+    R2  nameLength          Trimmed length between 4 and 60 characters.
+    R3  nameNoDigits        Must not contain any digit (0-9).
+    R4  nameShape           Allowed characters only: Unicode letters (any script,
+                            accents included), single spaces, hyphen (-),
+                            apostrophe ('), period (.).
+                            Regex: /^\p{L}[\p{L}'.-]*(?: \p{L}[\p{L}'.-]*)+$/u
+                            Every part must START with a letter.
+    R5  nameTwoParts        At least two space-separated parts, and every part
+                            must contain 2 or more letters.
+    R6  nameSingleSpace     No run of two or more consecutive spaces.
+    R7  nameTrim            No leading or trailing whitespace.
+
+    Accepted    "Ada O'Neill-Löve"   "Jean-Luc Picard"   "Sri Devi Kumar"
+    Rejected    "Ada"                (R5)  single part
+                "Ada  Lovelace2"     (R3, R6)
+                " Ada Lovelace"      (R7)
+                "A B"                (R2, R5)
+
+--------------------------------------------------------------------------------
+02. HANDLE                  control: username          type: text (max 20)
+--------------------------------------------------------------------------------
+    R1  required            Must not be empty.
+    R2  userLength          Between 3 and 20 characters.
+    R3  userCharset         Lowercase a-z, digits 0-9 and underscore only.
+                            Uppercase is rejected, not folded.
+    R4  userStart           First character must be a letter a-z.
+    R5  userEnd             Must not end with an underscore.
+    R6  userRepeatUnderscore  No two underscores in a row.
+    R7  userReserved        Must not be a reserved handle. Blocklist:
+                            admin, administrator, root, support, help, api, thor,
+                            mercor, system, null, undefined, moderator, staff,
+                            security, billing, www
+    R8  usernameTaken       ASYNC. Availability lookup, runs only after R1-R7
+                            pass. Debounced 450 ms, simulated latency 550 ms.
+                            While in flight the field reads "checking
+                            availability" and the ledger row shows a pulsing dot.
+                            The "available" chip stays unlit until the lookup has
+                            actually returned, so a check that never ran is never
+                            shown as a check that passed.
+                            Seeded as taken: arunabh, ada, linus, naomi, john_doe,
+                            test_user, designer, engineer, grace, alan_t, margaret
+
+    Accepted    "ada_lovelace"   "k8s_ninja"   "abc"
+    Rejected    "Ada"            (R3)  uppercase
+                "1ada"           (R4)
+                "ada_"           (R5)
+                "ada__x"         (R6)
+                "admin"          (R7)
+                "ada"            (R8)  taken
+
+--------------------------------------------------------------------------------
+03. DATE OF BIRTH           control: dateOfBirth       type: date
+--------------------------------------------------------------------------------
+    R1  required            Must not be empty.
+    R2  dobValid            Must parse as a real calendar date (ISO yyyy-mm-dd).
+    R3  dobPast             Must be strictly before today (midnight local).
+    R4  dobMinAge           Age >= 18 today. Age is computed on exact calendar
+                            date, so a birthday later this year does not count.
+    R5  dobMaxAge           Age <= 100.
+
+    The native picker is additionally capped with max="<today>", but R3-R5 are
+    enforced in code because a typed value can bypass the picker.
+
+    Accepted    a date 18 years and 1 day ago
+    Rejected    a date 17 years ago          (R4)
+                tomorrow                     (R3)
+                "1899-01-01"                 (R5)
+
+--------------------------------------------------------------------------------
+04. COUNTRY OF WORK         control: country           type: select
+--------------------------------------------------------------------------------
+    R1  required            Must be selected.
+    R2  countryKnown        Must be one of the supported ISO codes:
+                            IN, US, GB, CA, DE, AU, SG, NL
+
+    Cross-field impact: this field drives the phone rules (06) and the postal
+    code rules (10). Changing it re-validates both immediately.
+
+================================================================================
+STEP 02 - CONTACT AND ACCESS
+================================================================================
+
+--------------------------------------------------------------------------------
+05. EMAIL                   control: email             type: email
+--------------------------------------------------------------------------------
+    R1  required            Must not be empty or whitespace only.
+    R2  emailNoSpace        No whitespace anywhere in the raw value.
+    R3  emailShape          Exactly one address of the form local@domain, split
+                            on the LAST "@". Local part <= 64 characters and must
+                            match:
+                            /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*$/
+                            This forbids a leading dot, a trailing dot and any
+                            ".." run. Plus-addressing (ada+jobs@...) is allowed.
+    R4  emailDomain         Domain must be one or more DNS labels followed by an
+                            alphabetic TLD of 2-24 characters:
+                            /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,24}$/
+                            Bare hosts (localhost) and trailing hyphens fail.
+    R5  emailDisposable     Domain must not be a throwaway provider. Blocklist:
+                            mailinator.com, tempmail.com, 10minutemail.com,
+                            guerrillamail.com, yopmail.com, trashmail.com,
+                            throwawaymail.com, sharklasers.com, getnada.com,
+                            dispostable.com, temp-mail.org
+    R6  emailLength         Whole address <= 254 characters.
+
+    Comparison is case-insensitive; the stored value keeps what was typed.
+
+    Accepted    "ada@lovelace.dev"    "ada+jobs@some.co.uk"
+    Rejected    "ada@localhost"       (R4)
+                ".ada@lovelace.dev"   (R3)
+                "ada@mailinator.com"  (R5)
+
+--------------------------------------------------------------------------------
+06. PHONE                   control: phone             type: tel
+--------------------------------------------------------------------------------
+    Depends on: 04 COUNTRY
+
+    R1  required            Must not be empty.
+    R2  phoneCharset        Only digits, "+", space, hyphen and parentheses.
+    R3  phoneE164           After stripping spaces, hyphens and parentheses the
+                            value must match /^\+[1-9][0-9]{6,17}$/ - a leading
+                            "+", a non-zero first digit, 7 to 18 digits total.
+    R4  phoneDial           Must begin with the dial code of the selected country.
+    R5  phoneLength         The national number (everything after the dial code)
+                            must have the length that country uses.
+    R6  phoneLeading        The national number must start with a valid mobile
+                            prefix digit for that country.
+
+    Per-country table
+        Country          Dial   National digits   Valid first digit
+        India (IN)       +91    10                6 7 8 9
+        United States    +1     10                2-9
+        United Kingdom   +44    10                1 2 3 7
+        Canada (CA)      +1     10                2-9
+        Germany (DE)     +49    10-11             any
+        Australia (AU)   +61    9                 2 3 4 5 7 8
+        Singapore (SG)   +65    8                 6 8 9
+        Netherlands (NL) +31    9                 any
+
+    Accepted    "+91 98765 43210" with country IN
+                "+1 (415) 555-0123" with country US
+    Rejected    "+1 4155550123"  with country IN   (R4)
+                "+9198765"       with country IN   (R5)
+                "+91 5876543210" with country IN   (R6)
+
+--------------------------------------------------------------------------------
+07. PASSWORD                control: password          type: password
+--------------------------------------------------------------------------------
+    R1  required            Must not be empty.
+    R2  pwLength            Between 12 and 64 characters.
+    R3  pwUpper             At least one A-Z.
+    R4  pwLower             At least one a-z.
+    R5  pwDigit             At least one 0-9.
+    R6  pwSymbol            At least one of:  ! @ # $ % ^ & * ( ) - _ = + [ ] { }
+                            ; : , . < > ? / ~ ` | \ ' "
+    R7  pwNoSpace           No whitespace of any kind.
+    R8  pwNoRepeat          No character repeated 3+ times consecutively
+                            ("aaa", "111" are rejected; "aa" is fine).
+    R9  pwNotCommon         Must not CONTAIN any common password seed:
+                            password, passw0rd, qwerty, asdfgh, letmein, welcome,
+                            iloveyou, admin, monkey, dragon, football, sunshine,
+                            princess, abc123, 123456, 12345678, 87654321,
+                            starwars, changeme, trustno1
+                            Comparison is case-insensitive and substring based,
+                            so "MyPassword12!" is rejected.
+    R10 pwNotPersonal       Must not contain the handle (02) or the local part of
+                            the email (05), case-insensitive, when that string is
+                            3 characters or longer. Re-checked when either of
+                            those fields changes.
+
+    Strength meter (display only, never blocks submission) - 0 to 5 points:
+        +1  length >= 12
+        +1  length >= 16
+        +1  has both upper and lower case
+        +1  has a digit
+        +1  has a symbol
+        Labels: 0 Empty, 1 Fragile, 2 Weak, 3 Fair, 4 Strong, 5 Excellent
+
+    Accepted    "Tr0ubad0ur#Sky"
+    Rejected    "shortone"          (R2, R3, R5, R6)
+                "Aaaa1234!xyz"      (R8)
+                "MyPassword12!"     (R9)
+                "Zx#ada_lovelace9"  (R10) when the handle is ada_lovelace
+
+--------------------------------------------------------------------------------
+08. REPEAT PASSWORD         control: confirmPassword   type: password
+--------------------------------------------------------------------------------
+    R1  required            Must not be empty.
+    R2  confirmMatch        Must equal field 07 exactly, byte for byte.
+                            Re-validated whenever 07 changes, so the two fields
+                            can never disagree silently.
+
+================================================================================
+STEP 03 - PRACTICE AND CONSENT
+================================================================================
+
+--------------------------------------------------------------------------------
+09. PRIMARY DISCIPLINE      control: discipline        type: select
+--------------------------------------------------------------------------------
+    R1  required            Must be selected.
+    R2  disciplineKnown     Must be one of: Backend engineering, Frontend
+                            engineering, Machine learning, Data engineering,
+                            Security engineering, Site reliability,
+                            Product design, Technical writing
+
+--------------------------------------------------------------------------------
+10. POSTAL CODE             control: postalCode        type: text
+--------------------------------------------------------------------------------
+    Depends on: 04 COUNTRY
+
+    R1  required            Must not be empty or whitespace only.
+    R2  postalCountryFirst  A country must be selected before this can be judged.
+    R3  postalTrim          No leading or trailing whitespace.
+    R4  postalFormat        Must match the pattern for the selected country.
+                            The value is upper-cased before matching, so "sw1a
+                            1aa" passes; the stored value keeps what was typed.
+
+    Per-country patterns
+        IN  /^[1-9][0-9]{5}$/                     6 digits, not starting 0    560001
+        US  /^[0-9]{5}(-[0-9]{4})?$/              ZIP or ZIP+4                94107
+        GB  /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/  UK postcode          SW1A 1AA
+        CA  /^[ABCEGHJ-NPRSTVXY][0-9][ABCEGHJ-NPRSTV-Z] ?[0-9][ABCEGHJ-NPRSTV-Z][0-9]$/
+                                                  no D F I O Q U in letters   K1A 0B1
+        DE  /^[0-9]{5}$/                          5 digits                    10115
+        AU  /^[0-9]{4}$/                          4 digits                    3000
+        SG  /^[0-9]{6}$/                          6 digits                    018956
+        NL  /^[1-9][0-9]{3} ?[A-Z]{2}$/           4 digits + 2 letters        1012 AB
+
+--------------------------------------------------------------------------------
+11. PORTFOLIO LINK          control: portfolioUrl      type: url    OPTIONAL
+--------------------------------------------------------------------------------
+    An empty value is valid and is reported in the ledger as "skipped", not
+    "passed". Once anything is typed, every rule below applies.
+
+    R1  urlNoSpace          No whitespace anywhere.
+    R2  urlParse            Must parse with the WHATWG URL parser, which means an
+                            explicit scheme is required ("ada.dev" fails).
+    R3  urlHttps            Scheme must be exactly https:. http:, ftp: and
+                            javascript: are rejected.
+    R4  urlHost             Hostname must be a dotted domain with a 2-24
+                            character alphabetic TLD.
+    R5  urlPublic           Hostname must be publicly reachable: "localhost",
+                            any all-numeric host (raw IP) and any ".local" host
+                            are rejected.
+    R6  urlLength           Whole URL <= 200 characters.
+
+    Accepted    "https://ada.dev/work"    ""  (left blank)
+    Rejected    "http://ada.dev"          (R3)
+                "https://localhost:4200"  (R5)
+                "ada.dev"                 (R2)
+
+--------------------------------------------------------------------------------
+12. TERMS                   control: acceptTerms       type: checkbox
+--------------------------------------------------------------------------------
+    R1  termsAccepted       Value must be exactly boolean true. An unchecked box
+                            blocks submission and is listed as a failing check.
+
+================================================================================
+FORM-LEVEL BEHAVIOUR
+================================================================================
+
+  STEP GATING       "Continue" refuses to advance while any field in the current
+                    step is invalid. It marks that step's fields as touched,
+                    reveals their messages and focuses the first failing input.
+                    Going BACK is always allowed; the spine also lets you jump to
+                    any step directly.
+
+  SUBMISSION        Blocked while the form is invalid. On a blocked attempt every
+                    control is marked touched and the view jumps to the first
+                    failing field. On success the panel is replaced by a receipt
+                    listing the submitted values.
+
+  PREFLIGHT LEDGER  The right rail lists all 12 checks at all times with a live
+                    state: waiting (.), checking (pulsing dot), passed (check),
+                    failed (!), skipped (dash) for an untouched optional field.
+                    A failing row shows the same message as the field itself, and
+                    selecting a row jumps to that step and focuses the input.
+                    The gauge counts passed + skipped out of 12 as "cleared".
+
+  RE-VALIDATION MAP
+                    country  ->  phone, postalCode
+                    password ->  confirmPassword
+                    username ->  password
+                    email    ->  password
+                    Dependent controls are only re-checked once they hold a value
+                    or have been touched, so the form never fails a field the
+                    applicant has not reached yet.
+
+  ACCESSIBILITY     Every input has a real <label for>. Errors are plain text
+                    next to the field, not colour alone: each state also carries
+                    a distinct glyph. Focus rings are visible on all controls and
+                    all motion is disabled under prefers-reduced-motion.
+
+================================================================================

@@ -1,1 +1,130 @@
-/* You can add global styles to this file, and also import other style files */
+/* ==========================================================================
+   Thor — global tokens and reset
+   Direction: blueprint. Cool paper, navy ink, cobalt signal. The interface
+   behaves like an instrument panel: every rule is legible, nothing decorates.
+   ========================================================================== */
+
+:root {
+  /* Ground */
+  --paper: #eaeef5;
+  --paper-2: #f3f6fa;
+  --card: #ffffff;
+  --sunk: #f4f6fb;
+
+  /* Ink */
+  --ink: #0d1526;
+  --graphite: #5b6679;
+  --pending: #97a1b4;
+  --rule: #d5dbe6;
+  --rule-soft: #e5eaf2;
+
+  /* Signal */
+  --cobalt: #2340e0;
+  --cobalt-ink: #1b32b4;
+  --cobalt-wash: rgba(35, 64, 224, 0.1);
+  --pass: #0b7a63;
+  --pass-wash: rgba(11, 122, 99, 0.1);
+  --warn: #b57300;
+  --fail: #c8321f;
+  --fail-wash: rgba(200, 50, 31, 0.09);
+
+  --shadow: 0 1px 2px rgba(13, 21, 38, 0.04), 0 18px 44px -26px rgba(13, 21, 38, 0.45);
+
+  --font-display: 'Archivo', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  --radius: 10px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #070b13;
+    --paper-2: #0b1220;
+    --card: #0f1725;
+    --sunk: #131c2c;
+
+    --ink: #e8edf7;
+    --graphite: #939fb5;
+    --pending: #66738a;
+    --rule: #212c40;
+    --rule-soft: #1a2334;
+
+    --cobalt: #7b91ff;
+    --cobalt-ink: #94a6ff;
+    --cobalt-wash: rgba(123, 145, 255, 0.14);
+    --pass: #3ac9a1;
+    --pass-wash: rgba(58, 201, 161, 0.13);
+    --warn: #e0a53a;
+    --fail: #ff7b68;
+    --fail-wash: rgba(255, 123, 104, 0.12);
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 24px 60px -30px rgba(0, 0, 0, 0.9);
+    color-scheme: dark;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink);
+  background:
+    linear-gradient(180deg, var(--paper-2) 0%, var(--paper) 62%) fixed,
+    var(--paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+p,
+dl,
+dd,
+ol,
+ul {
+  margin: 0;
+}
+
+ol,
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

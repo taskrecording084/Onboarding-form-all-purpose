@@ -1,0 +1,993 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: clamp(18px, 2vw, 40px) clamp(16px, 2.6vw, 72px);
+}
+
+/* On desktop the shell IS the viewport: the form and the ledger scroll
+   independently, so the step actions and the gauge never leave the screen.
+   Below that breakpoint the page scrolls normally, like any phone form. */
+@media (min-width: 1021px) {
+  :host {
+    height: 100dvh;
+    overflow: hidden;
+  }
+}
+
+.shell {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ── masthead ───────────────────────────────────────────────────────────── */
+
+.masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 18px;
+  margin-bottom: clamp(18px, 3vw, 30px);
+  border-bottom: 1px solid var(--rule);
+}
+
+.mark {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.mark__wordmark {
+  font-family: var(--font-display);
+  font-variation-settings: 'wdth' 125, 'wght' 800;
+  font-size: 21px;
+  letter-spacing: -0.015em;
+  line-height: 1;
+}
+
+.mark__rule {
+  width: 26px;
+  height: 1px;
+  background: var(--rule);
+  flex: none;
+}
+
+.mark__kicker,
+.masthead__meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--graphite);
+  white-space: nowrap;
+}
+
+.masthead__meta {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── layout ─────────────────────────────────────────────────────────────── */
+
+.layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: clamp(180px, 13vw, 300px) minmax(0, 1fr) clamp(290px, 19vw, 440px);
+  gap: clamp(20px, 2.2vw, 52px);
+  align-items: stretch;
+  min-height: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* ── step rail ──────────────────────────────────────────────────────────── */
+
+.spine {
+  display: flex;
+  flex-direction: column;
+  padding-top: 6px;
+}
+
+.spine__step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  flex: 1;
+  padding: 4px 8px 24px 30px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+
+  /* marker */
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    border: 1.5px solid var(--rule);
+    background: var(--paper);
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  /* connector to the next step */
+  &::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 22px;
+    bottom: 4px;
+    width: 1px;
+    background: var(--rule);
+  }
+
+  &:last-child::after {
+    display: none;
+  }
+
+  &:hover .spine__label {
+    color: var(--ink);
+  }
+
+  &.is-active::before {
+    border-color: var(--cobalt);
+    background: var(--cobalt);
+    box-shadow: 0 0 0 4px var(--cobalt-wash);
+  }
+
+  &.is-done::before {
+    border-color: var(--pass);
+    background: var(--pass);
+  }
+}
+
+.spine__num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pending);
+
+  .is-active & {
+    color: var(--cobalt);
+  }
+
+  .is-done & {
+    color: var(--pass);
+  }
+}
+
+.spine__label {
+  font-family: var(--font-display);
+  font-variation-settings: 'wdth' 112, 'wght' 600;
+  font-size: 15px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--graphite);
+  transition: color 0.16s ease;
+
+  .is-active & {
+    color: var(--ink);
+  }
+}
+
+.spine__state {
+  margin-top: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--pending);
+
+  .is-done & {
+    color: var(--pass);
+  }
+}
+
+/* ── panel body ─────────────────────────────────────────────────────────── */
+
+.panel__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  /* `safe` keeps the top of a tall step reachable instead of clipping it. */
+  align-items: center;
+  justify-content: safe center;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+  padding: clamp(24px, 3.4vw, 44px) clamp(20px, 3.4vw, 48px) clamp(28px, 3.4vw, 44px);
+  animation: panel-in 0.32s cubic-bezier(0.22, 0.7, 0.28, 1) both;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+}
+
+.panel__head {
+  width: 100%;
+  max-width: 1160px;
+  margin-bottom: clamp(26px, 2.6vw, 44px);
+}
+
+.panel__title {
+  font-family: var(--font-display);
+  font-variation-settings: 'wdth' 118, 'wght' 700;
+  font-size: clamp(28px, 3.4vw, 56px);
+  line-height: 1.04;
+  letter-spacing: -0.028em;
+}
+
+.panel__blurb {
+  margin-top: 10px;
+  max-width: 62ch;
+  font-size: clamp(15px, 0.95vw, 18px);
+  color: var(--graphite);
+}
+
+/* ── fields ─────────────────────────────────────────────────────────────── */
+
+.fields {
+  display: grid;
+  width: 100%;
+  max-width: 1160px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(22px, 2vw, 34px) clamp(26px, 2.2vw, 44px);
+}
+
+.field--wide {
+  grid-column: 1 / -1;
+}
+
+.field__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+.field__index {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--pending);
+  font-variant-numeric: tabular-nums;
+}
+
+.field__name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.field__hint {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--pending);
+}
+
+.field__flag {
+  margin-left: auto;
+  flex: none;
+  width: 15px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 15px;
+  text-align: center;
+}
+
+/* Shared status glyphs for the field header and the preflight ledger. */
+.field__flag,
+.check__flag {
+  &[data-state='waiting']::after {
+    content: '·';
+    color: var(--pending);
+  }
+
+  &[data-state='checking']::after {
+    content: '•';
+    color: var(--cobalt);
+    animation: blink 0.9s steps(2, jump-none) infinite;
+  }
+
+  &[data-state='passed']::after {
+    content: '✓';
+    color: var(--pass);
+  }
+
+  &[data-state='failed']::after {
+    content: '!';
+    color: var(--fail);
+    font-weight: 600;
+  }
+
+  &[data-state='skipped']::after {
+    content: '–';
+    color: var(--pending);
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.input {
+  width: 100%;
+  height: clamp(50px, 3vw, 60px);
+  padding: 0 clamp(15px, 1vw, 20px);
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  font-size: clamp(15px, 0.95vw, 17px);
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+
+  &::placeholder {
+    color: var(--pending);
+  }
+
+  &:hover {
+    border-color: var(--graphite);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--cobalt);
+    box-shadow: 0 0 0 3px var(--cobalt-wash);
+  }
+}
+
+select.input {
+  appearance: none;
+  cursor: pointer;
+  padding-right: 38px;
+}
+
+input[type='date'].input {
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+
+.is-bad .input {
+  border-color: var(--fail);
+
+  &:focus {
+    box-shadow: 0 0 0 3px var(--fail-wash);
+  }
+}
+
+.input-combo {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  &--select::after {
+    content: '';
+    position: absolute;
+    right: 16px;
+    width: 7px;
+    height: 7px;
+    border-right: 1.5px solid var(--graphite);
+    border-bottom: 1.5px solid var(--graphite);
+    transform: translateY(-2px) rotate(45deg);
+    pointer-events: none;
+  }
+}
+
+.input-combo__prefix {
+  position: absolute;
+  left: 14px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--pending);
+  pointer-events: none;
+
+  + .input {
+    padding-left: 32px;
+  }
+}
+
+.input-combo__action {
+  position: absolute;
+  right: 6px;
+  padding: 7px 10px;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--graphite);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: var(--sunk);
+    color: var(--ink);
+  }
+}
+
+/* ── rule chips: the signature element ──────────────────────────────────── */
+
+.rules {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.26s cubic-bezier(0.22, 0.7, 0.28, 1), opacity 0.2s ease;
+
+  &.is-open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+}
+
+.rules__inner {
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 9px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1px dashed var(--rule);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  color: var(--pending);
+  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+
+  &::before {
+    content: '○';
+    font-size: 8px;
+    line-height: 1;
+  }
+
+  &.is-ok {
+    border-style: solid;
+    border-color: var(--pass-wash);
+    background: var(--pass-wash);
+    color: var(--pass);
+
+    &::before {
+      content: '✓';
+      font-size: 9px;
+    }
+  }
+}
+
+.field__msg {
+  display: flex;
+  gap: 7px;
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--fail);
+
+  &::before {
+    content: '!';
+    font-weight: 600;
+  }
+}
+
+/* ── password meter ─────────────────────────────────────────────────────── */
+
+.meter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.meter__track {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.meter__bar {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  background: var(--rule);
+  transition: background 0.22s ease;
+}
+
+.meter__label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pending);
+  min-width: 68px;
+  text-align: right;
+}
+
+.meter[data-score='1'] .meter__bar.is-lit,
+.meter[data-score='2'] .meter__bar.is-lit {
+  background: var(--fail);
+}
+
+.meter[data-score='3'] .meter__bar.is-lit {
+  background: var(--warn);
+}
+
+.meter[data-score='4'] .meter__bar.is-lit,
+.meter[data-score='5'] .meter__bar.is-lit {
+  background: var(--pass);
+}
+
+.meter[data-score='1'] .meter__label,
+.meter[data-score='2'] .meter__label {
+  color: var(--fail);
+}
+
+.meter[data-score='3'] .meter__label {
+  color: var(--warn);
+}
+
+.meter[data-score='4'] .meter__label,
+.meter[data-score='5'] .meter__label {
+  color: var(--pass);
+}
+
+/* ── consent ────────────────────────────────────────────────────────────── */
+
+.consent {
+  padding: 16px 18px;
+  background: var(--sunk);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius);
+
+  &.is-bad {
+    border-color: var(--fail);
+  }
+}
+
+.consent__row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+
+  /* The native box stays where it looks like it is, just transparent, so it
+     remains clickable and focusable while the styled square shows the state. */
+  input {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    width: 19px;
+    height: 19px;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+}
+
+.consent__box {
+  flex: none;
+  pointer-events: none; /* let the transparent native input take the click */
+  width: 19px;
+  height: 19px;
+  margin-top: 2px;
+  border: 1.5px solid var(--graphite);
+  border-radius: 5px;
+  background: var(--card);
+  position: relative;
+  transition: background 0.16s ease, border-color 0.16s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 4px;
+    height: 8px;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: translateY(-1px) rotate(45deg) scale(0.4);
+    opacity: 0;
+    transition: opacity 0.14s ease, transform 0.14s ease;
+  }
+}
+
+input:checked + .consent__box {
+  background: var(--cobalt);
+  border-color: var(--cobalt);
+
+  &::after {
+    opacity: 1;
+    transform: translateY(-1px) rotate(45deg) scale(1);
+  }
+}
+
+input:focus-visible + .consent__box {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 2px;
+}
+
+.consent__copy {
+  font-size: 14px;
+  color: var(--graphite);
+
+  .field__index {
+    margin-right: 6px;
+  }
+}
+
+/* ── footer actions ─────────────────────────────────────────────────────── */
+
+.panel__foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px clamp(20px, 3.4vw, 48px);
+  border-top: 1px solid var(--rule);
+  background: var(--sunk);
+}
+
+.btn {
+  height: 44px;
+  padding: 0 22px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.1s ease;
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.btn--primary {
+  background: var(--cobalt);
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    background: var(--cobalt-ink);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .btn--primary {
+    color: #0a0f1a;
+  }
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--rule);
+  color: var(--graphite);
+
+  &:hover:not(:disabled) {
+    border-color: var(--graphite);
+    color: var(--ink);
+  }
+}
+
+/* ── preflight ledger ───────────────────────────────────────────────────── */
+
+.ledger {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  min-height: 0;
+}
+
+.ledger__title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.ledger__blurb {
+  margin-top: 5px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--graphite);
+}
+
+.ledger__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-top: 14px;
+  border-top: 1px solid var(--rule);
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+
+.check {
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.check__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: clamp(9px, 1.1vh, 15px) 6px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.14s ease;
+
+  &:hover {
+    background: var(--card);
+  }
+}
+
+.check__num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--pending);
+  font-variant-numeric: tabular-nums;
+}
+
+.check__name {
+  flex: 1;
+  min-width: 0;
+  font-size: clamp(13px, 0.9vw, 15px);
+  color: var(--graphite);
+
+  [data-state='passed'] & {
+    color: var(--ink);
+  }
+
+  [data-state='failed'] & {
+    color: var(--fail);
+  }
+}
+
+.check__flag {
+  flex: none;
+  width: 15px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 15px;
+  text-align: center;
+}
+
+.check__note {
+  padding: 0 6px 9px 32px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.45;
+  color: var(--fail);
+}
+
+.ledger__foot {
+  flex: none;
+  margin-top: 16px;
+  padding-top: 4px;
+}
+
+.gauge {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--rule);
+  overflow: hidden;
+}
+
+.gauge__fill {
+  display: block;
+  height: 100%;
+  background: var(--cobalt);
+  transition: width 0.32s cubic-bezier(0.22, 0.7, 0.28, 1), background 0.3s ease;
+}
+
+.gauge__label {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--graphite);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── receipt ────────────────────────────────────────────────────────────── */
+
+.receipt {
+  margin: auto;
+  width: 100%;
+  max-width: clamp(640px, 55vw, 900px);
+  padding: clamp(28px, 4vw, 44px);
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  animation: panel-in 0.36s cubic-bezier(0.22, 0.7, 0.28, 1) both;
+}
+
+.receipt__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pass);
+}
+
+.receipt__title {
+  margin-top: 10px;
+  font-family: var(--font-display);
+  font-variation-settings: 'wdth' 118, 'wght' 700;
+  font-size: clamp(26px, 3.4vw, 34px);
+  line-height: 1.1;
+  letter-spacing: -0.028em;
+}
+
+.receipt__blurb {
+  margin-top: 10px;
+  max-width: 52ch;
+  color: var(--graphite);
+}
+
+.receipt__grid {
+  margin: 26px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.receipt__row {
+  display: flex;
+  gap: 16px;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--rule-soft);
+
+  dt {
+    width: 130px;
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--pending);
+    padding-top: 3px;
+  }
+
+  dd {
+    font-size: 14.5px;
+    word-break: break-word;
+  }
+}
+
+/* ── responsive ─────────────────────────────────────────────────────────── */
+
+/* Below three columns the rail lies down across the top. */
+@media (max-width: 1180px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) clamp(280px, 28vw, 340px);
+  }
+
+  .spine {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    gap: clamp(16px, 3vw, 40px);
+    padding: 0 0 6px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .spine__step {
+    flex: 1;
+    padding: 2px 0 8px 26px;
+
+    &::before {
+      top: 5px;
+    }
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 1020px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ledger {
+    align-self: auto;
+    padding-top: 4px;
+  }
+}
+
+@media (max-width: 640px) {
+  .fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .spine {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .spine__step {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 10px;
+    padding: 8px 0 8px 26px;
+
+    &::before {
+      top: 10px;
+    }
+  }
+
+  .spine__state {
+    display: none;
+  }
+
+  .masthead {
+    flex-wrap: wrap;
+  }
+
+  /* Keep the flag beside the name and drop a long hint onto its own line. */
+  .field__label {
+    flex-wrap: wrap;
+  }
+
+  .field__flag {
+    order: 2;
+  }
+
+  .field__hint {
+    order: 3;
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
+  /* Primary action on top, full width, the way a phone form should end. */
+  .panel__foot {
+    flex-direction: column-reverse;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
