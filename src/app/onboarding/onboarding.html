@@ -5,9 +5,31 @@
       <span class="mark__rule"></span>
       <span class="mark__kicker">Account registration</span>
     </div>
-    @if (!submitted()) {
-      <p class="masthead__meta">Step {{ step() + 1 }} of {{ steps.length }}</p>
-    }
+    <div class="masthead__right">
+      <div class="themes" role="group" aria-label="Theme">
+        @for (t of theme.themes; track t.id) {
+          <button
+            type="button"
+            class="themes__swatch"
+            [attr.data-theme-id]="t.id"
+            [class.is-active]="theme.current() === t.id"
+            [attr.aria-pressed]="theme.current() === t.id"
+            [title]="t.name + ' — ' + t.tagline + '. ' + t.fields + ' fields.'"
+            (click)="theme.select(t.id)"
+          >
+            <span class="themes__dot"></span>
+            <span class="sr-only">{{ t.name }}</span>
+          </button>
+        }
+      </div>
+      <p class="themes__caption">
+        <span class="themes__name">{{ theme.active().name }}</span>
+        <span class="themes__fields">{{ theme.active().fields }} fields</span>
+      </p>
+      @if (!submitted()) {
+        <p class="masthead__meta">Step {{ step() + 1 }} of {{ steps.length }}</p>
+      }
+    </div>
   </header>
 
   @if (submitted()) {

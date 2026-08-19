@@ -45,7 +45,8 @@
 
 .mark__wordmark {
   font-family: var(--font-display);
-  font-variation-settings: 'wdth' 125, 'wght' 800;
+  font-variation-settings: var(--wordmark-vs);
+  font-weight: 800;
   font-size: 21px;
   letter-spacing: -0.015em;
   line-height: 1;
@@ -72,6 +73,99 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ── theme switcher ─────────────────────────────────────────────────────── */
+
+.masthead__right {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 1.6vw, 24px);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.themes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.themes__swatch {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: border-color 0.16s ease, transform 0.12s ease;
+
+  &:hover {
+    border-color: var(--rule);
+    transform: translateY(-1px);
+  }
+
+  &.is-active {
+    border-color: var(--accent);
+  }
+}
+
+/* Each dot is a two-tone chip: the theme's ground against its accent, so the
+   switcher previews the palette instead of just naming it. */
+.themes__dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+}
+
+[data-theme-id='blueprint'] .themes__dot {
+  background: linear-gradient(135deg, #eaeef5 50%, #2340e0 50%);
+}
+
+[data-theme-id='carbon'] .themes__dot {
+  background: linear-gradient(135deg, #141416 50%, #ffb020 50%);
+}
+
+[data-theme-id='linen'] .themes__dot {
+  background: linear-gradient(135deg, #f2ece1 50%, #7a2f57 50%);
+}
+
+[data-theme-id='neon'] .themes__dot {
+  background: linear-gradient(135deg, #120e22 50%, #ff3ea5 50%);
+}
+
+[data-theme-id='terminal'] .themes__dot {
+  background: linear-gradient(135deg, #0a0f0a 50%, #35e06a 50%);
+}
+
+[data-theme-id='bloom'] .themes__dot {
+  background: linear-gradient(135deg, #f4f0fb 50%, #0e8f8a 50%);
+}
+
+.themes__caption {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+  min-width: 92px;
+}
+
+.themes__name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.themes__fields {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--pending);
+}
+
 /* ── layout ─────────────────────────────────────────────────────────────── */
 
 .layout {
@@ -88,7 +182,7 @@
   flex-direction: column;
   background: var(--card);
   border: 1px solid var(--rule);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   overflow: hidden;
 }
@@ -148,9 +242,9 @@
   }
 
   &.is-active::before {
-    border-color: var(--cobalt);
-    background: var(--cobalt);
-    box-shadow: 0 0 0 4px var(--cobalt-wash);
+    border-color: var(--accent);
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-wash);
   }
 
   &.is-done::before {
@@ -167,7 +261,7 @@
   color: var(--pending);
 
   .is-active & {
-    color: var(--cobalt);
+    color: var(--accent);
   }
 
   .is-done & {
@@ -177,7 +271,8 @@
 
 .spine__label {
   font-family: var(--font-display);
-  font-variation-settings: 'wdth' 112, 'wght' 600;
+  font-variation-settings: var(--spine-vs);
+  font-weight: 600;
   font-size: 15px;
   line-height: 1.25;
   letter-spacing: -0.01em;
@@ -232,10 +327,11 @@
 
 .panel__title {
   font-family: var(--font-display);
-  font-variation-settings: 'wdth' 118, 'wght' 700;
+  font-variation-settings: var(--display-vs);
+  font-weight: 700;
   font-size: clamp(28px, 3.4vw, 56px);
   line-height: 1.04;
-  letter-spacing: -0.028em;
+  letter-spacing: var(--display-tracking);
 }
 
 .panel__blurb {
@@ -274,11 +370,11 @@
 }
 
 .field__name {
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-family: var(--label-font);
+  font-size: var(--label-size);
   font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: var(--label-tracking);
+  text-transform: var(--label-transform);
   color: var(--ink);
 }
 
@@ -309,7 +405,7 @@
 
   &[data-state='checking']::after {
     content: '•';
-    color: var(--cobalt);
+    color: var(--accent);
     animation: blink 0.9s steps(2, jump-none) infinite;
   }
 
@@ -339,10 +435,12 @@
 .input {
   width: 100%;
   height: clamp(50px, 3vw, 60px);
-  padding: 0 clamp(15px, 1vw, 20px);
-  background: var(--card);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
+  padding: 0 var(--field-pad-x);
+  background: var(--field-bg);
+  border-style: solid;
+  border-color: var(--field-border-color);
+  border-width: var(--field-border-width);
+  border-radius: var(--field-radius);
   font-size: clamp(15px, 0.95vw, 17px);
   transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
 
@@ -351,20 +449,20 @@
   }
 
   &:hover {
-    border-color: var(--graphite);
+    border-color: var(--field-border-hover);
   }
 
   &:focus {
     outline: none;
-    border-color: var(--cobalt);
-    box-shadow: 0 0 0 3px var(--cobalt-wash);
+    border-color: var(--accent);
+    box-shadow: var(--field-focus);
   }
 }
 
 select.input {
   appearance: none;
   cursor: pointer;
-  padding-right: 38px;
+  padding-right: calc(var(--field-pad-x) + 24px);
 }
 
 input[type='date'].input {
@@ -373,7 +471,11 @@ input[type='date'].input {
 }
 
 .is-bad .input {
+  /* A tint, not an extra outline: themes whose fields have no border (filled,
+     pill) or only a bottom one (underlined) still read as failing, and the
+     field keeps the shape its theme gave it. */
   border-color: var(--fail);
+  background: var(--fail-wash);
 
   &:focus {
     box-shadow: 0 0 0 3px var(--fail-wash);
@@ -400,14 +502,14 @@ input[type='date'].input {
 
 .input-combo__prefix {
   position: absolute;
-  left: 14px;
+  left: var(--field-pad-x);
   font-family: var(--font-mono);
   font-size: 14px;
   color: var(--pending);
   pointer-events: none;
 
   + .input {
-    padding-left: 32px;
+    padding-left: calc(var(--field-pad-x) + 18px);
   }
 }
 
@@ -459,8 +561,8 @@ input[type='date'].input {
   align-items: center;
   gap: 5px;
   padding: 3px 8px;
-  border: 1px dashed var(--rule);
-  border-radius: 6px;
+  border: 1px var(--chip-border-style) var(--rule);
+  border-radius: var(--chip-radius);
   font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: 0.02em;
@@ -603,7 +705,7 @@ input[type='date'].input {
   height: 19px;
   margin-top: 2px;
   border: 1.5px solid var(--graphite);
-  border-radius: 5px;
+  border-radius: var(--check-radius);
   background: var(--card);
   position: relative;
   transition: background 0.16s ease, border-color 0.16s ease;
@@ -624,8 +726,8 @@ input[type='date'].input {
 }
 
 input:checked + .consent__box {
-  background: var(--cobalt);
-  border-color: var(--cobalt);
+  background: var(--accent);
+  border-color: var(--accent);
 
   &::after {
     opacity: 1;
@@ -634,7 +736,7 @@ input:checked + .consent__box {
 }
 
 input:focus-visible + .consent__box {
-  outline: 2px solid var(--cobalt);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -661,7 +763,7 @@ input:focus-visible + .consent__box {
 .btn {
   height: 44px;
   padding: 0 22px;
-  border-radius: var(--radius);
+  border-radius: var(--btn-radius);
   border: 1px solid transparent;
   font-size: 14px;
   font-weight: 600;
@@ -680,11 +782,11 @@ input:focus-visible + .consent__box {
 }
 
 .btn--primary {
-  background: var(--cobalt);
+  background: var(--accent);
   color: #fff;
 
   &:hover:not(:disabled) {
-    background: var(--cobalt-ink);
+    background: var(--accent-ink);
   }
 }
 
@@ -819,7 +921,7 @@ input:focus-visible + .consent__box {
 .gauge__fill {
   display: block;
   height: 100%;
-  background: var(--cobalt);
+  background: var(--accent);
   transition: width 0.32s cubic-bezier(0.22, 0.7, 0.28, 1), background 0.3s ease;
 }
 
@@ -841,7 +943,7 @@ input:focus-visible + .consent__box {
   padding: clamp(28px, 4vw, 44px);
   background: var(--card);
   border: 1px solid var(--rule);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   animation: panel-in 0.36s cubic-bezier(0.22, 0.7, 0.28, 1) both;
 }
@@ -857,10 +959,11 @@ input:focus-visible + .consent__box {
 .receipt__title {
   margin-top: 10px;
   font-family: var(--font-display);
-  font-variation-settings: 'wdth' 118, 'wght' 700;
+  font-variation-settings: var(--display-vs);
+  font-weight: 700;
   font-size: clamp(26px, 3.4vw, 34px);
   line-height: 1.1;
-  letter-spacing: -0.028em;
+  letter-spacing: var(--display-tracking);
 }
 
 .receipt__blurb {
@@ -965,6 +1068,12 @@ input:focus-visible + .consent__box {
 
   .masthead {
     flex-wrap: wrap;
+  }
+
+  .masthead__right {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 12px;
   }
 
   /* Keep the flag beside the name and drop a long hint onto its own line. */
