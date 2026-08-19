@@ -10,8 +10,8 @@ import { map, switchMap } from 'rxjs/operators';
 @Injectable({ providedIn: 'root' })
 export class UsernameAvailability {
   private readonly taken = new Set([
-    'arunabh', 'ada', 'linus', 'naomi', 'john_doe', 'test_user',
-    'designer', 'engineer', 'grace', 'alan_t', 'margaret',
+    'ada', 'grace', 'linus', 'naomi', 'john_doe', 'test_user',
+    'designer', 'engineer', 'alan_t', 'margaret', 'sam',
   ]);
 
   isTaken(username: string): Observable<boolean> {

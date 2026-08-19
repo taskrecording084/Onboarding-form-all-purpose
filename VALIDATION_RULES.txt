@@ -1,5 +1,5 @@
 ================================================================================
-THOR - SPECIALIST ONBOARDING
+ONBOARDING FORM
 VALIDATION RULES
 ================================================================================
 
@@ -56,8 +56,8 @@ STEP 01 - IDENTITY
     R5  userEnd             Must not end with an underscore.
     R6  userRepeatUnderscore  No two underscores in a row.
     R7  userReserved        Must not be a reserved handle. Blocklist:
-                            admin, administrator, root, support, help, api, thor,
-                            mercor, system, null, undefined, moderator, staff,
+                            admin, administrator, root, support, help, api,
+                            account, system, null, undefined, moderator, staff,
                             security, billing, www
     R8  usernameTaken       ASYNC. Availability lookup, runs only after R1-R7
                             pass. Debounced 450 ms, simulated latency 550 ms.
@@ -66,8 +66,8 @@ STEP 01 - IDENTITY
                             The "available" chip stays unlit until the lookup has
                             actually returned, so a check that never ran is never
                             shown as a check that passed.
-                            Seeded as taken: arunabh, ada, linus, naomi, john_doe,
-                            test_user, designer, engineer, grace, alan_t, margaret
+                            Seeded as taken: ada, grace, linus, naomi, john_doe,
+                            test_user, designer, engineer, alan_t, margaret, sam
 
     Accepted    "ada_lovelace"   "k8s_ninja"   "abc"
     Rejected    "Ada"            (R3)  uppercase
@@ -223,13 +223,12 @@ STEP 03 - PRACTICE AND CONSENT
 ================================================================================
 
 --------------------------------------------------------------------------------
-09. PRIMARY DISCIPLINE      control: discipline        type: select
+09. PRIMARY ROLE            control: role              type: select
 --------------------------------------------------------------------------------
     R1  required            Must be selected.
-    R2  disciplineKnown     Must be one of: Backend engineering, Frontend
-                            engineering, Machine learning, Data engineering,
-                            Security engineering, Site reliability,
-                            Product design, Technical writing
+    R2  roleKnown           Must be one of: Engineering, Design, Product,
+                            Data and analytics, Marketing, Sales, Operations,
+                            Customer support, Finance, People and HR, Other
 
 --------------------------------------------------------------------------------
 10. POSTAL CODE             control: postalCode        type: text
@@ -282,6 +281,7 @@ STEP 03 - PRACTICE AND CONSENT
 --------------------------------------------------------------------------------
     R1  termsAccepted       Value must be exactly boolean true. An unchecked box
                             blocks submission and is listed as a failing check.
+                            Message: "Accept the terms to create your account."
 
 ================================================================================
 FORM-LEVEL BEHAVIOUR
@@ -296,7 +296,7 @@ FORM-LEVEL BEHAVIOUR
   SUBMISSION        Blocked while the form is invalid. On a blocked attempt every
                     control is marked touched and the view jumps to the first
                     failing field. On success the panel is replaced by a receipt
-                    listing the submitted values.
+                    listing the submitted values ("Account created").
 
   PREFLIGHT LEDGER  The right rail lists all 12 checks at all times with a live
                     state: waiting (.), checking (pulsing dot), passed (check),
@@ -312,7 +312,7 @@ FORM-LEVEL BEHAVIOUR
                     email    ->  password
                     Dependent controls are only re-checked once they hold a value
                     or have been touched, so the form never fails a field the
-                    applicant has not reached yet.
+                    person has not reached yet.
 
   ACCESSIBILITY     Every input has a real <label for>. Errors are plain text
                     next to the field, not colour alone: each state also carries

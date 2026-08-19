@@ -132,10 +132,10 @@ export const FIELDS: FieldSpec[] = [
     ],
   },
   {
-    name: 'discipline', index: '09', step: 2, ledger: 'Discipline',
+    name: 'role', index: '09', step: 2, ledger: 'Role',
     rules: [
-      { key: 'required', message: 'Choose your primary discipline.' },
-      { key: 'disciplineKnown', chip: 'from the list', message: 'Choose a discipline from the list.' },
+      { key: 'required', message: 'Choose your primary role.' },
+      { key: 'roleKnown', chip: 'from the list', message: 'Choose a role from the list.' },
     ],
   },
   {
@@ -164,7 +164,7 @@ export const FIELDS: FieldSpec[] = [
   },
   {
     name: 'acceptTerms', index: '12', step: 2, ledger: 'Terms accepted',
-    rules: [{ key: 'termsAccepted', message: 'Accept the terms to submit your application.' }],
+    rules: [{ key: 'termsAccepted', message: 'Accept the terms to create your account.' }],
   },
 ];
 
@@ -172,7 +172,7 @@ export const STEPS = [
   {
     eyebrow: 'Step 01',
     title: 'Identity',
-    blurb: 'Your legal name is checked against the ID you upload later, so enter it exactly as printed.',
+    blurb: 'Enter your name exactly as it appears on your government ID, so verification does not stall later.',
   },
   {
     eyebrow: 'Step 02',
@@ -181,7 +181,7 @@ export const STEPS = [
   },
   {
     eyebrow: 'Step 03',
-    title: 'Practice and consent',
-    blurb: 'What you work on, where you are, and the terms you are agreeing to.',
+    title: 'Profile and consent',
+    blurb: 'What you do, where you are, and the terms you are agreeing to.',
   },
 ];

@@ -1,13 +1,13 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
-import { COUNTRIES, Country, DISCIPLINES } from '../data/onboarding-data';
+import { COUNTRIES, Country, ROLES } from '../data/onboarding-data';
 import { UsernameAvailability, usernameAvailabilityValidator } from '../services/username-availability';
 import {
   acceptTermsValidator,
   confirmPasswordValidator,
   countryValidator,
   dateOfBirthValidator,
-  disciplineValidator,
+  roleValidator,
   emailValidator,
   fullNameValidator,
   passwordScore,
@@ -31,7 +31,7 @@ export class Onboarding {
   private readonly fb = inject(FormBuilder);
 
   protected readonly countries = COUNTRIES;
-  protected readonly disciplines = DISCIPLINES;
+  protected readonly roles = ROLES;
   protected readonly steps = STEPS;
   protected readonly fields = FIELDS;
 
@@ -55,7 +55,7 @@ export class Onboarding {
     phone: this.fb.nonNullable.control('', phoneValidator),
     password: this.fb.nonNullable.control('', passwordValidator),
     confirmPassword: this.fb.nonNullable.control('', confirmPasswordValidator),
-    discipline: this.fb.nonNullable.control('', disciplineValidator),
+    role: this.fb.nonNullable.control('', roleValidator),
     postalCode: this.fb.nonNullable.control('', postalCodeValidator),
     portfolioUrl: this.fb.nonNullable.control('', portfolioUrlValidator),
     acceptTerms: this.fb.nonNullable.control(false, acceptTermsValidator),
@@ -257,7 +257,7 @@ export class Onboarding {
       { label: 'Phone', value: v.phone },
       { label: 'Country', value: this.selectedCountry?.name ?? '' },
       { label: 'Postal code', value: v.postalCode },
-      { label: 'Discipline', value: v.discipline },
+      { label: 'Role', value: v.role },
       { label: 'Portfolio', value: v.portfolioUrl || 'Not provided' },
     ];
   }

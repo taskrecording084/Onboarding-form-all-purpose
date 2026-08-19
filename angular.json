@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "thor": {
+    "onboarding-form": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -64,10 +64,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "thor:build:production"
+              "buildTarget": "onboarding-form:build:production"
             },
             "development": {
-              "buildTarget": "thor:build:development"
+              "buildTarget": "onboarding-form:build:development"
             }
           },
           "defaultConfiguration": "development"

@@ -1,9 +1,9 @@
 <div class="shell">
   <header class="masthead">
     <div class="mark">
-      <span class="mark__wordmark">Thor</span>
+      <span class="mark__wordmark">Onboarding</span>
       <span class="mark__rule"></span>
-      <span class="mark__kicker">Specialist network onboarding</span>
+      <span class="mark__kicker">Account registration</span>
     </div>
     @if (!submitted()) {
       <p class="masthead__meta">Step {{ step() + 1 }} of {{ steps.length }}</p>
@@ -12,10 +12,10 @@
 
   @if (submitted()) {
     <section class="receipt">
-      <p class="receipt__eyebrow">Application submitted</p>
+      <p class="receipt__eyebrow">Account created</p>
       <h1 class="receipt__title">All {{ total }} checks passed.</h1>
       <p class="receipt__blurb">
-        We review applications in the order they arrive. Expect a decision by email within three working days.
+        Your details are in. A confirmation is on its way to the email address you gave us.
       </p>
       <dl class="receipt__grid">
         @for (row of summary; track row.label) {
@@ -25,7 +25,7 @@
           </div>
         }
       </dl>
-      <button type="button" class="btn btn--ghost" (click)="startOver()">Start a new application</button>
+      <button type="button" class="btn btn--ghost" (click)="startOver()">Start another registration</button>
     </section>
   } @else {
     <form class="layout" [formGroup]="form" (ngSubmit)="submit()" novalidate>
@@ -266,24 +266,24 @@
             @case (2) {
               <div class="fields">
                 <!-- 09 discipline -->
-                <div class="field" [class.is-bad]="showMessage('discipline')">
-                  <label class="field__label" for="discipline">
+                <div class="field" [class.is-bad]="showMessage('role')">
+                  <label class="field__label" for="role">
                     <span class="field__index">09</span>
-                    <span class="field__name">Primary discipline</span>
-                    <span class="field__flag" [attr.data-state]="status('discipline')"></span>
+                    <span class="field__name">Primary role</span>
+                    <span class="field__flag" [attr.data-state]="status('role')"></span>
                   </label>
                   <div class="input-combo input-combo--select">
                     <select
-                      id="discipline" class="input" formControlName="discipline"
+                      id="role" class="input" formControlName="role"
                       (focus)="focused.set('discipline')" (blur)="focused.set(null)"
                     >
-                      <option value="" disabled>Select a discipline</option>
-                      @for (d of disciplines; track d) {
-                        <option [value]="d">{{ d }}</option>
+                      <option value="" disabled>Select a role</option>
+                      @for (r of roles; track r) {
+                        <option [value]="r">{{ r }}</option>
                       }
                     </select>
                   </div>
-                  @if (showMessage('discipline')) { <p class="field__msg">{{ message('discipline') }}</p> }
+                  @if (showMessage('role')) { <p class="field__msg">{{ message('role') }}</p> }
                 </div>
 
                 <!-- 10 postal code -->
@@ -343,7 +343,7 @@
                     <span class="consent__copy">
                       <span class="field__index">12</span>
                       I confirm the details above are accurate and I accept the
-                      network agreement and privacy notice.
+                      terms of service and privacy notice.
                     </span>
                   </label>
                   @if (showMessage('acceptTerms')) { <p class="field__msg">{{ message('acceptTerms') }}</p> }
@@ -359,7 +359,7 @@
             <button type="button" class="btn btn--primary" (click)="next()">Continue</button>
           } @else {
             <button type="submit" class="btn btn--primary" [disabled]="submitting()">
-              {{ submitting() ? 'Submitting...' : 'Submit application' }}
+              {{ submitting() ? 'Creating account...' : 'Create account' }}
             </button>
           }
         </footer>
@@ -368,7 +368,7 @@
       <aside class="ledger" aria-label="Validation status">
         <header class="ledger__head">
           <h2 class="ledger__title">Preflight</h2>
-          <p class="ledger__blurb">Every rule this application has to satisfy. Select a line to jump to it.</p>
+          <p class="ledger__blurb">Every rule this form has to satisfy. Select a line to jump to it.</p>
         </header>
 
         <ol class="ledger__list">

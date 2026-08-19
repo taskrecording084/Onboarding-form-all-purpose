@@ -52,24 +52,27 @@ export const COUNTRIES: Country[] = [
   },
 ];
 
-export const DISCIPLINES = [
-  'Backend engineering',
-  'Frontend engineering',
-  'Machine learning',
-  'Data engineering',
-  'Security engineering',
-  'Site reliability',
-  'Product design',
-  'Technical writing',
+export const ROLES = [
+  'Engineering',
+  'Design',
+  'Product',
+  'Data and analytics',
+  'Marketing',
+  'Sales',
+  'Operations',
+  'Customer support',
+  'Finance',
+  'People and HR',
+  'Other',
 ];
 
 /** Handles the platform keeps for itself. */
 export const RESERVED_USERNAMES = [
-  'admin', 'administrator', 'root', 'support', 'help', 'api', 'thor', 'mercor',
+  'admin', 'administrator', 'root', 'support', 'help', 'api', 'account',
   'system', 'null', 'undefined', 'moderator', 'staff', 'security', 'billing', 'www',
 ];
 
-/** Throwaway mail providers are rejected outright — we need to reach the applicant. */
+/** Throwaway mail providers are rejected outright — we need to reach the person. */
 export const DISPOSABLE_EMAIL_DOMAINS = [
   'mailinator.com', 'tempmail.com', '10minutemail.com', 'guerrillamail.com',
   'yopmail.com', 'trashmail.com', 'throwawaymail.com', 'sharklasers.com',

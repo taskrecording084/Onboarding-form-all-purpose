@@ -2,7 +2,7 @@ import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import {
   COMMON_PASSWORD_SEEDS,
   COUNTRIES,
-  DISCIPLINES,
+  ROLES,
   DISPOSABLE_EMAIL_DOMAINS,
   PASSWORD_SYMBOLS,
   RESERVED_USERNAMES,
@@ -220,12 +220,12 @@ export const postalCodeValidator: ValidatorFn = (c) => {
   return fail(e);
 };
 
-/* -- 10 . Discipline ----------------------------------------------------- */
+/* -- 10 . Role ----------------------------------------------------------- */
 
-export const disciplineValidator: ValidatorFn = (c) => {
+export const roleValidator: ValidatorFn = (c) => {
   const v = str(c);
   if (!v) return { required: true };
-  return DISCIPLINES.includes(v) ? null : { disciplineKnown: true };
+  return ROLES.includes(v) ? null : { roleKnown: true };
 };
 
 /* -- 11 . Portfolio URL (optional, but strict when present) -------------- */

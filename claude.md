@@ -1,8 +1,8 @@
-# thor
+# onboarding-form
 
 ## Purpose
-Angular web application. Currently hosts the **specialist onboarding form** —
-a three-step application flow whose subject is strict, visible validation.
+Angular web application hosting an all-purpose account **onboarding form** —
+a three-step registration flow whose subject is strict, visible validation.
 
 ## Stack
 - Angular 20.3.x (standalone components, no NgModules)
@@ -10,7 +10,7 @@ a three-step application flow whose subject is strict, visible validation.
 - Client-side rendering only (no SSR)
 - Karma + Jasmine for unit tests
 
-## The onboarding form
+## The form
 11 validated fields + 1 consent control, across 3 steps. Full rule-by-rule
 spec lives in `VALIDATION_RULES.txt` at the project root.
 
@@ -21,17 +21,18 @@ Key files
 - `src/app/onboarding/field-rules.ts` — rule metadata: chip label + message per
   error key, and the order that decides which message is shown.
 - `src/app/data/onboarding-data.ts` — countries (dial codes, phone lengths,
-  postal patterns), disciplines, reserved handles, blocklists.
+  postal patterns), roles, reserved handles, blocklists.
 - `src/app/services/username-availability.ts` — stubbed async handle lookup.
   Swap `isTaken` for an HttpClient call when the API exists.
 - `src/app/onboarding/onboarding.{ts,html,scss}` — the component.
 
 Design notes
 - Three-column app shell at >1180px: step rail, form panel, preflight ledger.
-  Desktop shell is viewport-height; the form and ledger scroll independently so
-  the step actions and the gauge never leave the screen.
+  The shell is fluid, not width-capped, and on desktop it is exactly viewport
+  height; the form and ledger scroll independently so the step actions and the
+  gauge never leave the screen.
 - The **preflight ledger** on the right lists all 12 checks live and is the
-  signature element; clicking a row jumps to that field.
+  signature element; selecting a row jumps to that field.
 - **Rule chips** under each input show every rule for that field and light up
   individually. Async rules stay unlit until the lookup actually returns.
 - Tokens (colour, type, radius) are global in `src/styles.scss`, including the
@@ -47,7 +48,7 @@ Adding a field
 
 ## Commands
 - `npm start` — dev server at http://localhost:4200
-- `npm run build` — production build to `dist/thor`
+- `npm run build` — production build to `dist/onboarding-form`
 - `npx ng test --watch=false --browsers=ChromeHeadless` — unit tests
 
 ## Notes
@@ -55,3 +56,11 @@ Adding a field
   project is pinned to Angular 20.
 - `anyComponentStyle` budget in `angular.json` was raised to 16kB/24kB for the
   design-heavy onboarding stylesheet.
+- Keep product naming generic. This is a reusable onboarding form, not a form
+  for one named company.
+
+## Git
+Remote: https://github.com/taskrecording084/Onboarding-form-all-purpose
+The session's GitHub account (`nextjedi`) only has READ on that repo; pushes go
+through a URL carrying the owner's username so the credential helper prompts for
+the owner account.

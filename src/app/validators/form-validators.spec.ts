@@ -3,7 +3,7 @@ import {
   confirmPasswordValidator,
   countryValidator,
   dateOfBirthValidator,
-  disciplineValidator,
+  roleValidator,
   emailValidator,
   fullNameValidator,
   passwordScore,
@@ -66,10 +66,10 @@ describe('username', () => {
 });
 
 describe('dateOfBirth', () => {
-  it('accepts an applicant over 18', () => {
+  it('accepts someone over 18', () => {
     expect(field('dateOfBirth', yearsAgo(25), dateOfBirthValidator).errors).toBeNull();
   });
-  it('rejects an applicant under 18', () => {
+  it('rejects someone under 18', () => {
     expect(field('dateOfBirth', yearsAgo(17), dateOfBirthValidator).errors?.['dobMinAge']).toBeTrue();
   });
   it('rejects a future date', () => {
@@ -77,15 +77,15 @@ describe('dateOfBirth', () => {
   });
 });
 
-describe('country and discipline', () => {
+describe('country and role', () => {
   it('accepts a known country code', () => {
     expect(field('country', 'IN', countryValidator).errors).toBeNull();
   });
   it('rejects an unknown code', () => {
     expect(field('country', 'ZZ', countryValidator).errors?.['countryKnown']).toBeTrue();
   });
-  it('rejects a discipline outside the list', () => {
-    expect(field('discipline', 'Alchemy', disciplineValidator).errors?.['disciplineKnown']).toBeTrue();
+  it('rejects a role outside the list', () => {
+    expect(field('role', 'Alchemy', roleValidator).errors?.['roleKnown']).toBeTrue();
   });
 });
 
