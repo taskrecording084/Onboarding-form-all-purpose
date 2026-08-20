@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { COUNTRIES, Country, ROLES } from '../data/onboarding-data';
+import { ThemeStore } from '../services/theme';
 import { UsernameAvailability, usernameAvailabilityValidator } from '../services/username-availability';
 import {
   acceptTermsValidator,
@@ -29,6 +30,7 @@ type CheckStatus = 'waiting' | 'checking' | 'passed' | 'failed' | 'skipped';
 })
 export class Onboarding {
   private readonly fb = inject(FormBuilder);
+  protected readonly theme = inject(ThemeStore);
 
   protected readonly countries = COUNTRIES;
   protected readonly roles = ROLES;

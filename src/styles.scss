@@ -1,27 +1,35 @@
 /* ==========================================================================
-   Onboarding — global tokens and reset
-   Direction: blueprint. Cool paper, navy ink, cobalt signal. The interface
-   behaves like an instrument panel: every rule is legible, nothing decorates.
+   Onboarding — global tokens, six themes, reset
+
+   A theme is more than a palette. Each block below sets three things:
+     · colour      — ground, ink and signal
+     · design      — radius, shadow, borders, type pairing
+     · field style — how an input is drawn (outlined, underlined, filled,
+                     inset, square, pill), expressed purely in tokens so no
+                     component CSS has to know which theme is active
+
+   Themes are applied by `data-theme` on <html>, set by ThemeStore.
+   Blueprint is the default and is the only one that follows the system
+   light/dark setting; the rest commit to one mode on purpose.
    ========================================================================== */
 
+/* ── 1 · Blueprint — cool paper, cobalt signal, outlined fields ─────────── */
+
 :root {
-  /* Ground */
   --paper: #eaeef5;
   --paper-2: #f3f6fa;
   --card: #ffffff;
   --sunk: #f4f6fb;
 
-  /* Ink */
   --ink: #0d1526;
   --graphite: #5b6679;
   --pending: #97a1b4;
   --rule: #d5dbe6;
   --rule-soft: #e5eaf2;
 
-  /* Signal */
-  --cobalt: #2340e0;
-  --cobalt-ink: #1b32b4;
-  --cobalt-wash: rgba(35, 64, 224, 0.1);
+  --accent: #2340e0;
+  --accent-ink: #1b32b4;
+  --accent-wash: rgba(35, 64, 224, 0.1);
   --pass: #0b7a63;
   --pass-wash: rgba(11, 122, 99, 0.1);
   --warn: #b57300;
@@ -29,17 +37,41 @@
   --fail-wash: rgba(200, 50, 31, 0.09);
 
   --shadow: 0 1px 2px rgba(13, 21, 38, 0.04), 0 18px 44px -26px rgba(13, 21, 38, 0.45);
+  --radius: 10px;
+  --radius-lg: 14px;
+  --btn-radius: 10px;
+  --chip-radius: 6px;
+  --chip-border-style: dashed;
+  --check-radius: 5px;
+
+  --field-bg: var(--card);
+  --field-border-width: 1px;
+  --field-border-color: var(--rule);
+  --field-border-hover: var(--graphite);
+  --field-radius: 10px;
+  --field-pad-x: 15px;
+  --field-focus: 0 0 0 3px var(--accent-wash);
 
   --font-display: 'Archivo', 'Segoe UI', system-ui, sans-serif;
   --font-body: 'Instrument Sans', 'Segoe UI', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --display-vs: 'wdth' 118, 'wght' 700;
+  --display-tracking: -0.028em;
+  --wordmark-vs: 'wdth' 125, 'wght' 800;
+  --spine-vs: 'wdth' 112, 'wght' 600;
 
-  --radius: 10px;
+  --label-font: var(--font-mono);
+  --label-size: 11px;
+  --label-transform: uppercase;
+  --label-tracking: 0.1em;
+
   color-scheme: light;
 }
 
+/* Blueprint alone follows the system setting. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]),
+  :root[data-theme='blueprint'] {
     --paper: #070b13;
     --paper-2: #0b1220;
     --card: #0f1725;
@@ -51,9 +83,9 @@
     --rule: #212c40;
     --rule-soft: #1a2334;
 
-    --cobalt: #7b91ff;
-    --cobalt-ink: #94a6ff;
-    --cobalt-wash: rgba(123, 145, 255, 0.14);
+    --accent: #7b91ff;
+    --accent-ink: #94a6ff;
+    --accent-wash: rgba(123, 145, 255, 0.14);
     --pass: #3ac9a1;
     --pass-wash: rgba(58, 201, 161, 0.13);
     --warn: #e0a53a;
@@ -64,6 +96,269 @@
     color-scheme: dark;
   }
 }
+
+/* ── 2 · Carbon — industrial dark, amber signal, underlined fields ──────── */
+
+:root[data-theme='carbon'] {
+  --paper: #0b0b0c;
+  --paper-2: #0f0f11;
+  --card: #141416;
+  --sunk: #1a1a1d;
+
+  --ink: #ecedef;
+  --graphite: #9a9ca1;
+  --pending: #66686e;
+  --rule: #2a2b2f;
+  --rule-soft: #202124;
+
+  --accent: #ffb020;
+  --accent-ink: #ffc247;
+  --accent-wash: rgba(255, 176, 32, 0.14);
+  --pass: #4ec9a0;
+  --pass-wash: rgba(78, 201, 160, 0.13);
+  --warn: #ffb020;
+  --fail: #ff6b5e;
+  --fail-wash: rgba(255, 107, 94, 0.12);
+
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.03), 0 20px 50px -34px #000;
+  --radius: 3px;
+  --radius-lg: 4px;
+  --btn-radius: 3px;
+  --chip-radius: 2px;
+  --chip-border-style: solid;
+  --check-radius: 2px;
+
+  /* underlined: no box, just a rule under the value */
+  --field-bg: transparent;
+  --field-border-width: 0 0 1.5px;
+  --field-border-color: var(--rule);
+  --field-border-hover: var(--graphite);
+  --field-radius: 0;
+  --field-pad-x: 2px;
+  --field-focus: 0 1px 0 0 var(--accent);
+
+  --display-vs: 'wdth' 100, 'wght' 800;
+  --display-tracking: -0.03em;
+  --wordmark-vs: 'wdth' 100, 'wght' 800;
+  --spine-vs: 'wdth' 100, 'wght' 600;
+
+  --label-tracking: 0.16em;
+  --label-size: 10px;
+
+  color-scheme: dark;
+}
+
+/* ── 3 · Linen — warm paper, plum accent, filled fields ─────────────────── */
+
+:root[data-theme='linen'] {
+  --paper: #f2ece1;
+  --paper-2: #f9f5ed;
+  --card: #fffdf8;
+  --sunk: #efe7d9;
+
+  --ink: #241f1a;
+  --graphite: #6b6055;
+  --pending: #a2978a;
+  --rule: #ddd2c0;
+  --rule-soft: #eae1d2;
+
+  --accent: #7a2f57;
+  --accent-ink: #622445;
+  --accent-wash: rgba(122, 47, 87, 0.11);
+  --pass: #3f6b48;
+  --pass-wash: rgba(63, 107, 72, 0.12);
+  --warn: #96690f;
+  --fail: #a83232;
+  --fail-wash: rgba(168, 50, 50, 0.1);
+
+  --shadow: 0 1px 2px rgba(60, 45, 30, 0.05), 0 22px 50px -30px rgba(60, 45, 30, 0.4);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --btn-radius: 8px;
+  --chip-radius: 4px;
+  --chip-border-style: solid;
+  --check-radius: 4px;
+
+  /* filled: tinted well, no outline until focus */
+  --field-bg: var(--sunk);
+  --field-border-width: 0;
+  --field-border-color: transparent;
+  --field-border-hover: transparent;
+  --field-radius: 8px;
+  --field-pad-x: 16px;
+  --field-focus: 0 0 0 3px var(--accent-wash);
+
+  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --display-vs: normal;
+  --display-tracking: -0.012em;
+  --wordmark-vs: normal;
+  --spine-vs: normal;
+
+  --label-font: var(--font-body);
+  --label-size: 11px;
+  --label-tracking: 0.13em;
+
+  color-scheme: light;
+}
+
+/* ── 4 · Neon — violet dark, magenta glow, inset fields ─────────────────── */
+
+:root[data-theme='neon'] {
+  --paper: #08060f;
+  --paper-2: #0c0918;
+  --card: #120e22;
+  --sunk: #1a1430;
+
+  --ink: #ece9ff;
+  --graphite: #a49bd0;
+  --pending: #6f66a0;
+  --rule: #2a2350;
+  --rule-soft: #1f1a3d;
+
+  --accent: #ff3ea5;
+  --accent-ink: #ff6bbb;
+  --accent-wash: rgba(255, 62, 165, 0.16);
+  --pass: #2ee6b0;
+  --pass-wash: rgba(46, 230, 176, 0.14);
+  --warn: #ffc44d;
+  --fail: #ff5470;
+  --fail-wash: rgba(255, 84, 112, 0.14);
+
+  --shadow: 0 0 0 1px rgba(255, 62, 165, 0.08), 0 30px 70px -34px rgba(255, 62, 165, 0.5);
+  --radius: 12px;
+  --radius-lg: 18px;
+  --btn-radius: 999px;
+  --chip-radius: 999px;
+  --chip-border-style: solid;
+  --check-radius: 6px;
+
+  /* inset: sunk well that lights up on focus */
+  --field-bg: var(--sunk);
+  --field-border-width: 1px;
+  --field-border-color: var(--rule);
+  --field-border-hover: var(--accent-ink);
+  --field-radius: 12px;
+  --field-pad-x: 18px;
+  --field-focus: 0 0 0 3px var(--accent-wash), 0 0 26px -6px var(--accent);
+
+  --font-display: 'Space Grotesk', 'Archivo', system-ui, sans-serif;
+  --display-vs: normal;
+  --display-tracking: -0.03em;
+  --wordmark-vs: normal;
+  --spine-vs: normal;
+
+  --label-tracking: 0.14em;
+
+  color-scheme: dark;
+}
+
+/* ── 5 · Terminal — phosphor green, monospace throughout, square fields ─── */
+
+:root[data-theme='terminal'] {
+  --paper: #050705;
+  --paper-2: #070a07;
+  --card: #0a0f0a;
+  --sunk: #0e150e;
+
+  --ink: #d6ffd6;
+  --graphite: #74a274;
+  --pending: #47643f;
+  --rule: #1d2c1d;
+  --rule-soft: #142014;
+
+  --accent: #35e06a;
+  --accent-ink: #64f291;
+  --accent-wash: rgba(53, 224, 106, 0.13);
+  --pass: #35e06a;
+  --pass-wash: rgba(53, 224, 106, 0.13);
+  --warn: #ffd166;
+  --fail: #ff5f56;
+  --fail-wash: rgba(255, 95, 86, 0.12);
+
+  --shadow: none;
+  --radius: 0;
+  --radius-lg: 0;
+  --btn-radius: 0;
+  --chip-radius: 0;
+  --chip-border-style: solid;
+  --check-radius: 0;
+
+  /* square: a hard box, the way a TUI draws one */
+  --field-bg: var(--sunk);
+  --field-border-width: 1px;
+  --field-border-color: #24421f;
+  --field-border-hover: var(--graphite);
+  --field-radius: 0;
+  --field-pad-x: 12px;
+  --field-focus: 0 0 0 1px var(--accent);
+
+  --font-display: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+  --font-body: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+  --display-vs: normal;
+  --display-tracking: -0.02em;
+  --wordmark-vs: normal;
+  --spine-vs: normal;
+
+  --label-tracking: 0.12em;
+
+  color-scheme: dark;
+}
+
+/* ── 6 · Bloom — soft lilac, teal accent, pill fields ───────────────────── */
+
+:root[data-theme='bloom'] {
+  --paper: #f4f0fb;
+  --paper-2: #fbf9ff;
+  --card: #ffffff;
+  --sunk: #f2ecfa;
+
+  --ink: #201a2b;
+  --graphite: #6a6280;
+  --pending: #a49dbb;
+  --rule: #e3dbf0;
+  --rule-soft: #efe9f8;
+
+  --accent: #0e8f8a;
+  --accent-ink: #0a726e;
+  --accent-wash: rgba(14, 143, 138, 0.12);
+  --pass: #2e9e6b;
+  --pass-wash: rgba(46, 158, 107, 0.12);
+  --warn: #c78400;
+  --fail: #e0455f;
+  --fail-wash: rgba(224, 69, 95, 0.1);
+
+  --shadow: 0 2px 4px rgba(60, 40, 90, 0.04), 0 26px 60px -30px rgba(60, 40, 90, 0.35);
+  --radius: 16px;
+  --radius-lg: 24px;
+  --btn-radius: 999px;
+  --chip-radius: 999px;
+  --chip-border-style: solid;
+  --check-radius: 7px;
+
+  /* pill: fully rounded and filled, no hard outline */
+  --field-bg: var(--sunk);
+  --field-border-width: 0;
+  --field-border-color: transparent;
+  --field-border-hover: transparent;
+  --field-radius: 999px;
+  --field-pad-x: 22px;
+  --field-focus: 0 0 0 4px var(--accent-wash);
+
+  --font-display: 'Instrument Sans', system-ui, sans-serif;
+  --display-vs: normal;
+  --display-tracking: -0.022em;
+  --wordmark-vs: normal;
+  --spine-vs: normal;
+
+  --label-font: var(--font-body);
+  --label-size: 12px;
+  --label-transform: none;
+  --label-tracking: 0.01em;
+
+  color-scheme: light;
+}
+
+/* ── reset ──────────────────────────────────────────────────────────────── */
 
 *,
 *::before,
@@ -113,9 +408,21 @@ select {
 }
 
 :focus-visible {
-  outline: 2px solid var(--cobalt);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -40,6 +40,19 @@ Design notes
 - Fonts: Archivo (display, variable width axis), Instrument Sans (body),
   IBM Plex Mono (labels, chips, ledger) — loaded in `src/index.html`.
 
+Theming
+- Six themes, each setting colour + geometry + field style. Catalogue in
+  `src/app/data/themes.ts`, tokens in `src/styles.scss` under
+  `:root[data-theme='<id>']`, applied by `ThemeStore` (`src/app/services/theme.ts`)
+  which writes `data-theme` on <html> and persists to localStorage.
+- Only Blueprint follows `prefers-color-scheme`; the other five commit to a mode.
+- Field style is entirely token-driven: `--field-bg`, `--field-border-width`
+  (multi-value, which is how the underlined theme works), `--field-border-color`,
+  `--field-radius`, `--field-pad-x`, `--field-focus`. Never add a
+  `[data-theme=...]` rule inside the component; add a token instead.
+- The invalid-field state is a `--fail-wash` background tint, not an extra
+  outline, so borderless and underlined themes keep their shape.
+
 Adding a field
 1. Add the validator to `form-validators.ts` (return granular keys).
 2. Add its `FieldSpec` to `FIELDS` in `field-rules.ts` with chip labels/messages.

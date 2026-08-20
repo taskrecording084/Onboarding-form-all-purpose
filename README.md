@@ -22,6 +22,34 @@ actually returned; a check that never ran is never shown as a check that passed.
 format and the postal-code format. The password is checked against the handle
 and the email local part. Change one field and its dependants re-validate.
 
+## Themes
+
+Six of them. A theme is not just a palette — each one sets its own colour,
+its own geometry (radius, shadow, borders, type pairing) and its own **field
+style**, so the same form genuinely looks like a different product.
+
+| Theme | Mode | Fields | Character |
+|-------|------|--------|-----------|
+| Blueprint | follows system | Outlined | Cool paper, cobalt signal, engineered grotesk |
+| Carbon | dark | Underlined | Industrial, amber signal, 3px radius |
+| Linen | light | Filled | Warm paper, plum accent, serif display |
+| Neon | dark | Inset glow | Violet ground, magenta glow, pill buttons |
+| Terminal | dark | Square | Phosphor green, monospace throughout, zero radius |
+| Bloom | light | Pill | Soft lilac, teal accent, generous curves |
+
+Pick one from the switcher in the masthead; the choice is stored in
+`localStorage` and applied as `data-theme` on `<html>`.
+
+Every theme is a block of custom properties in `src/styles.scss`. No component
+style hardcodes a colour, a radius or a border — including the inputs, whose
+entire look comes from `--field-bg`, `--field-border-width`, `--field-radius`,
+`--field-pad-x` and `--field-focus`. That is what lets a single `.input` rule
+render as outlined, underlined, filled, inset, square or pill.
+
+To add a seventh: append a record to `THEMES` in `src/app/data/themes.ts`, add a
+matching `:root[data-theme='...']` block, and add its swatch gradient in
+`onboarding.scss`.
+
 ## The fields
 
 | # | Field | Notes |
